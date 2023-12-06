@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  version: 1.0.0
+  description: API for user authentication
+
+tags:
+  - name: Auth
+    description: The authorization managing API
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - userId
+        - name
+        - email
+        - password
+      properties:
+        userId:
+          type: string
+          description: The auto-generated id of the user
+        name:
+          type: string
+          description: The user's name
+        email:
+          type: string
+          description: The user's email address
+        password:
+          type: string
+          description: The user's password
+        cart:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  costumeId:
+                    type: string
+                    description: The ID of the costume
+                  quantity:
+                    type: integer
+                    description: The quantity of the costume in the cart
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /auth/signup:
+    put:
+      summary: Create account with a user's name, email, and password
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: The user was successfully signed up
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '500':
+          description: There was a server error
+
+  /auth/login:
+    post:
+      summary: Submit user email and password to authenticate and log in
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Login was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '500':
+          description: There was a server error
+
+  /auth/reset:
+    post:
+      summary: Reset password
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reset'
+      responses:
+        '200':
+          description: The password was reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '500':
+          description: There was a server error
+
+  /auth/new-password:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Set new password
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPassword'
+      responses:
+        '200':
+          description: New password has been set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '500':
+          description: There was a server error

@@ -1,0 +1,81 @@
+# Tags
+tags:
+  - name: Admin
+    description: The Admin managing API
+
+# POST routes
+paths:
+  /admin/add-costume:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Create a new costume entry in the database
+      tags: [Admin]
+      description: Create a new costume entry in the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rentals'
+      responses:
+        '200':
+          description: The costume was successfully added to the database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Costume'
+        '500':
+          description: There was a server error
+
+# PUT routes
+  /admin/edit-costume:
+    put:
+      security:
+        - bearerAuth: []
+      summary: Edit details of an existing costume
+      tags: [Admin]
+      description: Edit details of an existing costume
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editCostume'
+      responses:
+        '200':
+          description: The costume was successfully changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Costume'
+        '500':
+          description: There was a server error
+
+# DELETE routes
+  /admin/delete-costume/{costumeId}:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Delete a costume by ID
+      tags: [Admin]
+      description: Delete a costume by ID
+      parameters:
+        - in: path
+          name: costumeId
+          schema:
+            type: string
+            description: ID of the costume to delete
+          required: true
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: ID not found
+        '403':
+          description: Unauthorized
+        '500':
+          description: There was a server error
+
+
+

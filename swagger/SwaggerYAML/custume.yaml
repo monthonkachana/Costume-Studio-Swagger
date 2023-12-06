@@ -1,0 +1,227 @@
+openapi: 3.0.0
+info:
+  title: Costume Rental API
+  version: 1.0.0
+  description: API for managing costumes, carts, and rentals
+
+tags:
+  - name: Rentals
+    description: The rental managing API
+
+components:
+  schemas:
+    Costume:
+      type: object
+      required:
+        - costumeName
+        - category
+        - rentalFee
+        - size
+        - imageUrl
+        - description
+      properties:
+        costumeName:
+          type: string
+        category:
+          type: string
+        rentalFee:
+          type: number
+        size:
+          type: string
+        imageUrl:
+          type: string
+        description:
+          type: string
+        userId:
+          type: string
+
+    Cart:
+      type: object
+      required:
+        - costumeId
+        - userId
+      properties:
+        costumeId:
+          type: string
+        userId:
+          type: string
+
+    Rentals:
+      type: object
+      properties:
+        rentalId:
+          type: string
+            // other rental properties go here
+
+    CancelRental:
+      type: object
+      required:
+        - costumeId
+      properties:
+        costumeId:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /costumes:
+    get:
+      summary: Gets a list of all the costumes
+      tags:
+        - Rentals
+      responses:
+        '200':
+          description: List of costumes displayed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Costume'
+
+  /costumes/{costumeId}:
+    get:
+      summary: Gets the details of the costume with the id
+      tags:
+        - Rentals
+      parameters:
+        - in: path
+          name: costumeId
+          schema:
+            type: string
+          required: true
+          description: This is the costume id
+      responses:
+        '200':
+          description: Costume information by costumeId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Costume'
+        '404':
+          description: The costume was not found
+
+  /cart:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get the user's cart information for added costumes currently in the cart
+      tags:
+        - Rentals
+      responses:
+        '200':
+          description: Information about cart contents displayed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Costume'
+
+  /rentals:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Gets all rentals for a single user
+      tags:
+        - Rentals
+      responses:
+        '200':
+          description: Display list of rentals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rentals'
+
+  /rentals/{rentalId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Gets the details of the rental with the rental id
+      tags:
+        - Rentals
+      parameters:
+        - in: path
+          name: rentalId
+          schema:
+            type: string
+          required: true
+          description: This is the rental id
+      responses:
+        '200':
+          description: Get rental information for a single past rental
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rentals'
+        '404':
+          description: The rental was not found
+
+  /checkout:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Gets checkout process
+      tags:
+        - Rentals
+      responses:
+        '200':
+          description: Starts checkout process for user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rentals'
+
+    /cart:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Add costume to cart for potential rental
+      tags:
+        - Rentals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cart'
+      responses:
+        '200':
+          description: The costume was successfully added to the cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Costume'
+        '500':
+          description: There was a server error
+
+  /cancel-rental:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Remove costume from cart
+      tags:
+        - Rentals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelRental'
+      responses:
+        '200':
+          description: The costume was successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Costume'
+        '500':
+          description: There was a server error
